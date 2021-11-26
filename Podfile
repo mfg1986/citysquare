@@ -3,7 +3,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 # platform :ios, '9.0'
 
 def shared_base_pods
-
+  pod 'RealmSwift'
 end
 
 target 'citysquare' do
