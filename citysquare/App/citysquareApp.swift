@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct citysquareApp: App {
+    
     var body: some Scene {
         WindowGroup {
+            let viewModel = ListCityViewModel(state: ListCityState())
             ContentView()
+                .environmentObject(AnyViewModel(viewModel))
+                .environmentObject(LocalStorage())
         }
     }
 }
