@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab: Int = 0
-
+    @State var showSplash = true
+    
     let tabs: [Tab] = [
         .init(icon: Image(systemName: "list.bullet"), title: "List of Cities"),
         .init(icon: Image(systemName: "map.fill"), title: "Map of Cities"),
@@ -25,28 +26,40 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationView {
-            GeometryReader { geo in
-                VStack(spacing: 0) {
-                    // Tabs
-                    TabIconView(tabs: tabs, geoWidth: geo.size.width, selectedTab: $selectedTab)
+        ZStack{
+            NavigationView {
+                GeometryReader { geo in
+                    VStack(spacing: 0) {
+                        // Tabs
+                        TabIconView(tabs: tabs, geoWidth: geo.size.width, selectedTab: $selectedTab)
 
-                    // Views
-                    TabView(selection: $selectedTab,
-                            content: {
-                                ListCityView().tag(0)
-                                MapAllCityView().tag(1)
-                            })
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                        // Views
+                        TabView(selection: $selectedTab,
+                                content: {
+                                    ListCityView().tag(0)
+                                    MapAllCityView().tag(1)
+                                })
+                                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    }
+                    .navigationTitle("Cities of World")
+                    .background(
+                        Image("bg_listcity")
+                            .resizable()
+                            .edgesIgnoringSafeArea(.all)
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    )
+                    
                 }
-                .navigationTitle("Cities of World")
-                .background(
-                    Image("bg_listcity")
-                        .resizable()
-                        .edgesIgnoringSafeArea(.all)
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                )
-                
+            }
+            
+            SplashView()
+              .opacity(showSplash ? 1 : 0)
+              .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                  withAnimation() {
+                    self.showSplash = false
+                  }
+                }
             }
         }
     }
