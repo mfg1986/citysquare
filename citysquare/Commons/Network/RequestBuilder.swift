@@ -19,15 +19,28 @@ extension URL{
         var pageParams = ""
         
         if searchTerm != nil && !(searchTerm?.isEmpty ?? true) {
-            pageParams = "&filter[0][name][contains]=\(searchTerm ?? "")"
+            if pageParams.isEmpty{
+                pageParams = "filter[0][name][contains]=\(searchTerm ?? "")"
+            }else{
+                pageParams = "&filter[0][name][contains]=\(searchTerm ?? "")"
+            }
         }
         
         if page ?? 0 > 0 {
-            pageParams = "\(pageParams)&page=\(page ?? -1)"
+            if pageParams.isEmpty{
+                pageParams = "\(pageParams)page=\(page ?? 0)"
+            }else{
+                pageParams = "\(pageParams)&page=\(page ?? 0)"
+            }
+           
         }
         
         if include ?? false {
-            pageParams = "\(pageParams)&include=conuntry"
+            if pageParams.isEmpty{
+                pageParams = "\(pageParams)include=country"
+            }else{
+                pageParams = "\(pageParams)&include=country"
+            }
         }
         
        

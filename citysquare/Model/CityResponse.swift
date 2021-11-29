@@ -40,7 +40,7 @@ struct City: Codable, Identifiable {
     let createdAt:String?
     let updatedAt:String?
     let countryId: Int?
-    let country: Country?
+    var country: Country?
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
@@ -50,10 +50,22 @@ struct City: Codable, Identifiable {
         case lng = "lng"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
-        case countryId = "countryId"
+        case countryId = "country_id"
         case country = "country"
     }
     
+    init(cityDB: CityDB) {
+        id = cityDB.id
+        name = cityDB.name
+        localName = cityDB.localName
+        lat = cityDB.lat
+        lng = cityDB.lng
+        createdAt = cityDB.createdAt
+        updatedAt = cityDB.updatedAt
+        countryId = cityDB.countryId
+        country = nil
+    }
+
     
 }
 
@@ -73,6 +85,15 @@ struct Country: Codable, Identifiable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case continentId = "continent_id"
+    }
+    
+    init(countryDB: CountryDB) {
+        id = countryDB.id
+        name = countryDB.name
+        code = countryDB.code
+        createdAt = countryDB.createdAt
+        updatedAt = countryDB.updatedAt
+        continentId = countryDB.continentId
     }
     
 }

@@ -15,7 +15,7 @@ extension CityAPI {
         guard let url = URL.buildCityEndPoint(page: page, include:include, searchTerm: searchTerm) else {
             return Empty().eraseToAnyPublisher()
         }
-        print("[URL]\(url)")
+        print("[TAG]\(url)")
         return send(url, method: .GET)
     }
 
