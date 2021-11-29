@@ -8,13 +8,23 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
+    
+    struct CityAnnotationItem: Identifiable {
+        var coordinate: CLLocationCoordinate2D
+        let id = UUID()
+    }
+    
     var coordinate: CLLocationCoordinate2D
     @State private var region = MKCoordinateRegion()
+    @State private var currentAnnotation = [CityAnnotationItem]()
 
     var body: some View {
-        Map(coordinateRegion: $region)
+        Map(coordinateRegion: $region, annotationItems: currentAnnotation){item in
+            MapPin(coordinate: item.coordinate)
+        }
             .onAppear {
                 setRegion(coordinate)
+                currentAnnotation = [CityAnnotationItem(coordinate:coordinate)]
             }
     }
 
