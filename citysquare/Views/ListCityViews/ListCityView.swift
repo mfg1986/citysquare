@@ -18,83 +18,127 @@ struct ListCityView: View {
     private var numberPage: String = ""
     @State
     private var searchText: String = ""
+
+    
+    @State
+    private var showFilters = false
+    
+    struct ColoredToggleStyle: ToggleStyle {
+        var label = ""
+        var onColor = Color(UIColor.green)
+        var offColor = Color(UIColor.systemGray5)
+        var thumbColor = Color.white
+        
+        func makeBody(configuration: Self.Configuration) -> some View {
+            HStack {
+                Text(label).foregroundColor(.white).font(.title3)
+                Spacer()
+                Button(action: { configuration.isOn.toggle() } )
+                {
+                    RoundedRectangle(cornerRadius: 16, style: .circular)
+                        .fill(configuration.isOn ? onColor : offColor)
+                        .frame(width: 50, height: 29)
+                        .overlay(
+                            Circle()
+                                .fill(thumbColor)
+                                .shadow(radius: 1, x: 0, y: 1)
+                                .padding(1.5)
+                                .offset(x: configuration.isOn ? 10 : -10))
+                        .animation(Animation.easeInOut(duration: 0.1))
+                }
+            }
+            .font(.title)
+            .padding(.horizontal)
+        }
+    }
     
     var body: some View {
-        VStack() {
-      
-            //Include country
-            Toggle(isOn: $isOn, label: {
-                HStack{
-                    Text("Include country information")
-                       .font(.title3)
-                       .foregroundColor(Color.white)
-                }
-            }).onChange(of: isOn) { value in
-                viewModel.includeCountry.value = value
-                viewModel.currentPage.value = Int(numberPage) ?? 0
-                viewModel.searchTerm.value = searchText
-                viewModel.trigger(.deleteCache)
-                viewModel.trigger(.newSearch)
-            }.padding()
-                .toggleStyle(SwitchToggleStyle(tint: Color.cyan))
-              
-            //Page selector
-            HStack{
-                Text("Select Page:").foregroundColor(.white) .font(.title3)//foregroundColor(Color("ultra_dark_gray"))
-                TextField("Page Number", text: $numberPage,onEditingChanged: {(changed) in
-                                    print("Username onEditingChanged - \(changed)")
-                                }, onCommit: {
-                                    
-                                    viewModel.includeCountry.value = isOn
-                                    viewModel.currentPage.value = Int(numberPage) ?? 0
-                                    viewModel.searchTerm.value = searchText
-                                    viewModel.trigger(.deleteCache)
-                                    viewModel.trigger(.newSearch)
-                                    
-                                })
-                                .frame(height: 30)
-                                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 6))
-                                .cornerRadius(5)
-                                .foregroundColor(Color("ultra_dark_gray"))
-                                .background(.white)
-                                .cornerRadius(5)
-                                .keyboardType(.numberPad)
-                                .onReceive(Just(numberPage)) { newValue in
-                                    let filtered = newValue.filter { "0123456789".contains($0) }
-                                    if filtered != newValue { self.numberPage = filtered }
-                                }
-            }
-            .padding()
-            
-            Spacer()
-                
-            //Search Bar
+        VStack(spacing: 0) {
             VStack {
-                HStack {
-                         Image(systemName: "magnifyingglass")
-                         TextField("Search by characteres..", text: $searchText,onEditingChanged: {(changedText) in
-                             print("Username onEditingChanged - \(changedText)")
-                         }, onCommit: {
-                             viewModel.includeCountry.value = isOn
-                             viewModel.currentPage.value = Int(numberPage) ?? 0
-                             viewModel.searchTerm.value = searchText
-                             viewModel.trigger(.deleteCache)
-                             viewModel.trigger(.newSearch)
-                             
-                         })
+                HStack(spacing:300){
+                    Text("Filters").foregroundColor(.white).font(.title2)
+                    Image(systemName: self.showFilters == true ? "chevron.up": "chevron.down").foregroundColor(.white)
+                }.onTapGesture {
+                    showFilters.toggle()
+                    if showFilters {
+                        self.launchNewSearchWithFilter()
+                    }else{
+                        isOn = false
+                        searchText = ""
+                        numberPage = ""
+                        self.launchNewSearchWithFilter()
+                    }
+                }.frame(width: UIScreen.main.bounds.width, height:40)
+                Rectangle().fill(Color.white)
+                    .frame(width: UIScreen.main.bounds.width,height:2)
+              
+            }
+           
+            if showFilters {
+                
+                
+                VStack {
+                    //Include country
+                    Toggle("", isOn: $isOn)
+                        .onChange(of: isOn) { value in
+                            self.launchNewSearchWithFilter()
+                        }.padding()
+                        .toggleStyle(
+                            ColoredToggleStyle(label:"Include country information",
+                                                   onColor: .cyan,
+                                                   offColor: .gray,
+                                                   thumbColor: .white))
+                      
+                    //Page selector
+                    HStack{
+                        Text("Select Page:").foregroundColor(.white) .font(.title3)
+                        TextField("Page Number", text: $numberPage,onEditingChanged: {(changed) in
+                                            print("Username onEditingChanged - \(changed)")
+                                        }, onCommit: {
+                                            self.launchNewSearchWithFilter()
+                                            
+                                        })
+                                        .frame(height: 30)
+                                        .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 6))
+                                        .cornerRadius(5)
+                                        .foregroundColor(Color("ultra_dark_gray"))
+                                        .background(.white)
+                                        .cornerRadius(5)
+                                        .keyboardType(.numberPad)
+                                        .onReceive(Just(numberPage)) { newValue in
+                                            let filtered = newValue.filter { "0123456789".contains($0) }
+                                            if filtered != newValue { self.numberPage = filtered }
+                                        }
+                    }
+                    .padding()
+                        
+                    //Search Bar
+                    VStack {
+                        HStack {
+                                 Image(systemName: "magnifyingglass")
+                                 TextField("Search by characteres..", text: $searchText,onEditingChanged: {(changedText) in
+                                     print("Username onEditingChanged - \(changedText)")
+                                 }, onCommit: {
+                                     self.launchNewSearchWithFilter()
+                                     
+                                 })
+                            
+                        }
+                        .frame(height:20)
+                        .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+                        .background(.white)
+                        .cornerRadius(10)
+                        .foregroundColor(Color("darkgray"))
+                    
+                        
+                    }
+                    .padding(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20))
                     
                 }
-                .frame(height:20)
-                .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
-                .background(.white)
-                .cornerRadius(10)
-                .foregroundColor(Color("darkgray"))
-            
-                
+                .padding()
+                .background(Color.white.opacity(0.1))
             }
-            .padding(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20))
-            
-            Spacer()
+
             
             content
         }
@@ -150,14 +194,21 @@ extension ListCityView {
     
     private func listItemAppears<Item: Identifiable>(_ item: Item) {
        
-        if self.viewModel.state.cities.isThresholdItem(offset: 1, item: item) &&
-            self.numberPage.isEmpty &&
-            self.searchText.isEmpty {
+        if !showFilters &&
+            self.viewModel.state.cities.isThresholdItem(offset: 1, item: item){
             print("[TAG] listItemAppears: \(item.id)")
             self.viewModel.trigger(.noDeleteCache)
             self.viewModel.trigger(.nextPage)
             self.viewModel.trigger(.reloadPage)
         }
+    }
+    
+    private func launchNewSearchWithFilter(){
+        viewModel.includeCountry.value = isOn
+        viewModel.currentPage.value = Int(numberPage) ?? 0
+        viewModel.searchTerm.value = searchText
+        viewModel.trigger(.deleteCache)
+        viewModel.trigger(.newSearch)
     }
 }
 

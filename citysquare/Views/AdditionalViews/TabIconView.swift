@@ -43,6 +43,8 @@ struct TabIconView: View {
                                             .padding(EdgeInsets(top: 10, leading: 3, bottom: 10, trailing: 15))
                                     }
                                     .frame(width: fixed ? (geoWidth / CGFloat(tabs.count)) : .none, height: 52)
+                                    .background(Color.white.opacity(0.4))
+                                    
                                     // Bar Indicator
                                     Rectangle().fill(selectedTab == row ? Color.white : Color.clear)
                                         .frame(height: 3)
@@ -55,6 +57,7 @@ struct TabIconView: View {
                     .onChange(of: selectedTab) { target in
                         withAnimation {
                             proxy.scrollTo(target)
+                            
                         }
                     }
                 }
@@ -62,7 +65,6 @@ struct TabIconView: View {
         }
         .frame(height: 55)
         .onAppear(perform: {
-            //UIScrollView.appearance().backgroundColor = UIColor(#colorLiteral(red: 0.6196078431, green: 0.1098039216, blue: 0.2509803922, alpha: 1))
             UIScrollView.appearance().bounces = fixed ? false : true
         })
         .onDisappear(perform: {
